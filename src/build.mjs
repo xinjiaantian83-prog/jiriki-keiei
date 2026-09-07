@@ -50,7 +50,7 @@ function markdown(source){
   return out.join('\n');
 }
 
-const formatDate=date=>new Intl.DateTimeFormat('ja-JP',{year:'numeric',month:'long',day:'numeric'}).format(new Date(`${date}T00:00:00+09:00`));
+const formatDate=date=>new Intl.DateTimeFormat('ja-JP',{year:'numeric',month:'long',day:'numeric',timeZone:'Asia/Tokyo'}).format(new Date(`${date}T00:00:00+09:00`));
 const articleUrl=article=>`${domain}/articles/${article.slug}/`;
 
 function head({title,description,path='/',type='website',assetPrefix=''}){
