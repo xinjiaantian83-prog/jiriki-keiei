@@ -4,6 +4,7 @@ description: 広告費ゼロ、現場で余った材料の無料配布から地�
 date: 2026-09-05
 category: 0円から始めた集客
 featured: true
+published: false
 ---
 
 自分でお客様を集めようと考えたとき、最初から立派なホームページや広告があったわけではありません。

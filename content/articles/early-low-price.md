@@ -4,6 +4,7 @@ description: 直客を増やしたい焦りから安く受け、見積りや価�
 date: 2026-09-03
 category: 下請け依存と価格
 featured: true
+published: false
 ---
 
 直客の依頼が入り始めた頃は、断られるのが怖くてかなり安い金額を出していました。

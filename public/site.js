@@ -23,8 +23,8 @@ if(measurementId){
     if(!link)return;
     const href=link.getAttribute('href')||'';
 
-    if(link.matches('.quiet-cta a')){
-      sendEvent('click_hp_service',{link_url:href,link_text:link.textContent.trim()});
+    if(link.matches('.hp-service-link')){
+      sendEvent('click_hp_service',{link_url:href,link_text:link.textContent.trim(),source:'jiriki-blog',ref:'jiriki-blog'});
     }
 
     let url;

@@ -4,6 +4,7 @@ description: AI検索の専門知識がない地方の現場職人が、Google�
 date: 2026-09-07
 category: 自力集客
 featured: true
+published: true
 ---
 
 5年ほど前、うちはほぼ下請け100%でした。
