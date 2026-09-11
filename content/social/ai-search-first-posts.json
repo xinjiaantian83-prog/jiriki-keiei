@@ -18,8 +18,9 @@
       "linkPlacement": "none",
       "linkTarget": null,
       "scheduledAt": "2026-09-12T07:00:00+09:00",
-      "posted": false,
-      "postUrl": null
+      "posted": true,
+      "postedAt": "2026-09-11T20:09:13+09:00",
+      "postUrl": "https://x.com/jiriki_keiei/status/2098368257392836933"
     },
     {
       "postId": "ai-search-first-x-02",
