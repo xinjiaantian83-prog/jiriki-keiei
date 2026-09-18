@@ -1,3 +1,12 @@
+const guideStyles=document.createElement('link');
+guideStyles.rel='stylesheet';
+guideStyles.href=new URL('guide.css',document.querySelector('link[rel="stylesheet"]')?.href||window.location.href).href;
+document.head.appendChild(guideStyles);
+const guideComponentStyles=document.createElement('link');
+guideComponentStyles.rel='stylesheet';
+guideComponentStyles.href=new URL('guide-components.css',document.querySelector('link[rel="stylesheet"]')?.href||window.location.href).href;
+document.head.appendChild(guideComponentStyles);
+
 const measurementId=window.SITE_CONFIG?.ga4MeasurementId?.trim();
 if(measurementId){
   window.dataLayer=window.dataLayer||[];
@@ -18,6 +27,14 @@ if(measurementId){
     });
   }
 
+  const guidePage=document.body.dataset.guidePage;
+  if(guidePage==='short'){
+    sendEvent('guide_short_view',{guide_name:'hp_after_publish',page_path:window.location.pathname});
+  }
+  if(guidePage==='full'){
+    sendEvent('guide_full_view',{guide_name:'hp_after_publish',page_path:window.location.pathname});
+  }
+
   document.addEventListener('click',event=>{
     const link=event.target.closest('a[href]');
     if(!link)return;
@@ -29,6 +46,13 @@ if(measurementId){
 
     let url;
     try{url=new URL(href,window.location.href)}catch{return}
+    const guideEvent=link.dataset.guideEvent;
+    if(guideEvent==='guide_full_click'){
+      sendEvent('guide_full_click',{source_page:window.location.pathname,destination:url.pathname});
+    }
+    if(guideEvent==='guide_cweb_click'){
+      sendEvent('guide_cweb_click',{source_page:window.location.pathname,link_url:url.href,link_text:link.textContent.trim()});
+    }
     if(url.hostname==='note.com'||url.hostname.endsWith('.note.com')){
       sendEvent('click_note',{link_url:url.href,link_text:link.textContent.trim()});
     }
