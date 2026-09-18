@@ -8,7 +8,7 @@ const siteName='現場屋の自力経営';
 const subtitle='下請けに頼り切らず、自分で仕事を取れる状態を作るまでの実録';
 
 const escapeHtml=value=>String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-const inline=value=>escapeHtml(value).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`(.+?)`/g,'<code>$1</code>');
+const inline=value=>escapeHtml(value).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`(.+?)`/g,'<code>$1</code>').replace(/\[([^\]]+)\]\((\/[^)]+)\)/g,'<a href="$2">$1</a>');
 
 function parseFile(file){
   const raw=readFileSync(file,'utf8');
@@ -61,6 +61,15 @@ function markdown(source){
 
 const formatDate=date=>new Intl.DateTimeFormat('ja-JP',{year:'numeric',month:'long',day:'numeric',timeZone:'Asia/Tokyo'}).format(new Date(`${date}T00:00:00+09:00`));
 const articleUrl=article=>`${domain}/articles/${article.slug}/`;
+const author={
+  '@type':'Person',
+  name:'現場屋の自力経営 運営者',
+  url:`${domain}/about/`,
+  jobTitle:'外構・エクステリア現場職人',
+  description:'愛媛県松山市周辺で外構・エクステリアとカーポート施工の経験を重ね、下請け中心から直客集客へ移行してきた現役の現場職人。',
+  homeLocation:{'@type':'Place',name:'愛媛県松山市周辺'},
+  knowsAbout:['外構工事','エクステリア','カーポート施工','現場仕事の直客集客']
+};
 
 function head({title,description,path='/',type='website',assetPrefix='',structuredData=null}){
   const url=`${domain}${path}`;
@@ -71,17 +80,18 @@ function head({title,description,path='/',type='website',assetPrefix='',structur
 const header=prefix=>`<header class="site-header"><div class="wrap header-inner"><a class="brand" href="${prefix}" aria-label="${siteName}トップへ"><span class="brand-mark">自</span><span>${siteName}<small>FIELD NOTES ON INDEPENDENT BUSINESS</small></span></a><nav class="site-nav" data-nav aria-label="メインメニュー"><a href="${prefix}#about">このブログについて</a><a href="${prefix}#articles">実録を読む</a><a href="${prefix}#guides">実務ガイド</a><a href="${prefix}about/">運営方針</a><a href="${prefix}contact/">お問い合わせ</a></nav><button class="menu" data-menu type="button" aria-label="メニューを開く" aria-expanded="false"><span></span><span></span></button></div></header>`;
 const footer=prefix=>`<footer class="site-footer"><div class="wrap footer-main"><a class="brand" href="${prefix}"><span class="brand-mark">自</span><span>${siteName}<small>${subtitle}</small></span></a><div class="footer-links"><a href="${prefix}about/">このブログについて</a><a href="${prefix}privacy/">プライバシーポリシー</a><a href="${prefix}disclaimer/">免責事項</a><a href="${prefix}contact/">お問い合わせ</a></div></div><div class="wrap footer-bottom">© 2026 現場屋の自力経営</div></footer><script src="${prefix}site-config.js"></script><script src="${prefix}site.js"></script></body></html>`;
 
-const articles=readdirSync(join(root,'content/articles')).filter(file=>file.endsWith('.md')).map(file=>parseFile(join(root,'content/articles',file))).filter(article=>article.published!==false).sort((a,b)=>b.date.localeCompare(a.date));
+const articles=readdirSync(join(root,'content/articles')).filter(file=>file.endsWith('.md')).map(file=>parseFile(join(root,'content/articles',file))).filter(article=>article.published!==false).sort((a,b)=>b.date.localeCompare(a.date)||Number(b.episode)-Number(a.episode));
 const guides=readdirSync(join(root,'content/guides')).filter(file=>file.endsWith('.md')).map(file=>parseFile(join(root,'content/guides',file))).filter(guide=>guide.published!==false);
 const shortGuide=guides.find(guide=>guide.kind==='short');
 const fullGuide=guides.find(guide=>guide.kind==='full');
 if(!shortGuide||!fullGuide)throw new Error('Guide source files are missing');
 const categories=['0円から始めた集客','Google・口コミ','下請け依存と価格','HP・AI','実録・失敗・途中経過'];
-const card=article=>`<a class="article-card" href="articles/${article.slug}/"><div class="meta"><span class="tag">${escapeHtml(article.category)}</span><time datetime="${article.date}">${formatDate(article.date)}</time></div><h3>${escapeHtml(article.title)}</h3><p>${escapeHtml(article.description)}</p><span class="read">続きを読む →</span></a>`;
+const card=article=>`<a class="article-card" href="articles/${article.slug}/"><div class="meta">${article.episode?`<span class="tag">第${escapeHtml(article.episode)}話</span>`:''}<span class="tag">${escapeHtml(article.category)}</span><time datetime="${article.date}">${formatDate(article.date)}</time></div><h3>${escapeHtml(article.title)}</h3><p>${escapeHtml(article.description)}</p><span class="read">続きを読む →</span></a>`;
+const firstEpisode=articles.find(article=>Number(article.episode)===1);
 
 const home=`${head({title:`${siteName}｜${subtitle}`,description:'地方の現場職人が、下請けだけに頼らず自分で仕事を取れる状態を作るまでの実体験、失敗、遠回り、途中経過を記録するブログ。'})}<body>${header('./')}<main><section class="hero"><div class="wrap"><div class="eyebrow">地方の現場職人による実録</div><h1>${siteName}<span>下請け100%だった職人が、HPを公開して約3年。<br>今ではAI検索をきっかけに、問い合わせが来るようになりました。</span></h1><p>特別なことをしたわけではありません。投稿を忘れたり、サボったりもしました。それでも、できる時に少しずつ積み上げてきた実録です。</p></div></section>
 <section class="section" id="about"><div class="wrap about-grid"><div class="about-label">下請けを否定したいわけではありません。<br>選べない状態から抜けたいだけです。</div><div class="about-copy"><div class="eyebrow">ABOUT THIS BLOG</div><h2>誰と、いくらで、いつ働くか。<br>少しずつ自分で選べるように。</h2><p>下請けには、営業せず施工へ集中できる良さがあります。ただ、そこしか仕事の入口がないと、価格も日程も仕事量も自分では決めにくくなります。</p><p><strong>「下請けしか選べない状態」から少しずつ抜ける。</strong>このブログが書きたいのは、その途中の話です。</p><p>成功法則ではありません。もっと早い方法もあるかもしれませんが、少なくとも自分が実際にやったこと、失敗したこと、まだ試していることを淡々と残します。</p></div></div></section>
-<section class="section alt pathway-section" id="guides"><div class="wrap"><div class="section-head"><div><div class="eyebrow">TWO WAYS TO READ</div><h2>実録と、実務ガイド。</h2></div><p>これまでの経緯を読む連載と、今すぐ使える考え方をまとめた実務ガイドを分けています。</p></div><div class="pathway-grid"><a class="pathway-card" href="#articles"><span>連載</span><h3>実録を読む</h3><p>下請け中心だった頃から、直客の入口を少しずつ増やしてきた過程です。</p><strong>第1話から読む →</strong></a><a class="pathway-card guide" href="guide/hp-after-publish/"><span>無料ガイド</span><h3>現場屋向け実務ガイド</h3><p>ホームページ公開後に、無理なく続ける最低限の運用をまとめました。</p><strong>ガイドを読む →</strong></a></div></div></section>
+<section class="section alt pathway-section" id="guides"><div class="wrap"><div class="section-head"><div><div class="eyebrow">TWO WAYS TO READ</div><h2>実録と、実務ガイド。</h2></div><p>これまでの経緯を読む連載と、今すぐ使える考え方をまとめた実務ガイドを分けています。</p></div><div class="pathway-grid"><a class="pathway-card" href="articles/${firstEpisode.slug}/"><span>連載</span><h3>実録を読む</h3><p>下請け中心だった頃から、直客の入口を少しずつ増やしてきた過程です。</p><strong>第1話から読む →</strong></a><a class="pathway-card guide" href="guide/hp-after-publish/"><span>無料ガイド</span><h3>現場屋向け実務ガイド</h3><p>ホームページ公開後に、無理なく続ける最低限の運用をまとめました。</p><strong>ガイドを読む →</strong></a></div></div></section>
 <section class="section alt" id="articles"><div class="wrap"><div class="section-head"><div><div class="eyebrow">START HERE</div><h2>まず読んでほしい記事</h2></div><p>広告費も知識もほとんどないところから始めました。実際にやってきたことを、順番に公開していきます。</p></div><div class="article-grid">${articles.filter(a=>a.featured).map(card).join('')}</div></div></section>
 <section class="section"><div class="wrap"><div class="section-head"><div><div class="eyebrow">CATEGORY</div><h2>テーマから読む</h2></div></div><div class="category-list">${categories.map(category=>`<a href="#latest" data-category="${escapeHtml(category)}">${escapeHtml(category)}</a>`).join('')}</div></div></section>
 <section class="section alt" id="latest"><div class="wrap"><div class="section-head"><div><div class="eyebrow">LATEST</div><h2>最新記事</h2></div></div><div class="article-grid">${articles.map(card).join('')}</div></div></section>
@@ -89,7 +99,7 @@ const home=`${head({title:`${siteName}｜${subtitle}`,description:'地方の現�
 <section class="wrap quiet-cta"><div><h2>ここまで読んで、考え方に合うと感じた方へ</h2><p>現場仕事を理解したホームページ制作を、<strong>300,000円（税込）</strong>で行っています。</p></div><a class="text-link hp-service-link" href="https://construction-web-terra.com/?ref=jiriki-blog#contact">HP制作について詳しく見る →</a></section></main>${footer('./')}`;
 
 const stripGuideLead=body=>body.replace(/^# .*\n\n## .*\n\n/,'').trim();
-const guideSchema=(guide,path)=>({'@context':'https://schema.org','@graph':[{'@type':'Article',headline:guide.h1,description:guide.description,mainEntityOfPage:`${domain}${path}`,publisher:{'@type':'Organization',name:siteName,url:domain}},{'@type':'BreadcrumbList',itemListElement:[{'@type':'ListItem',position:1,name:siteName,item:`${domain}/`},{'@type':'ListItem',position:2,name:'現場屋向け実務ガイド',item:`${domain}/guide/hp-after-publish/`},...(guide.kind==='full'?[{'@type':'ListItem',position:3,name:'詳細版',item:`${domain}${path}`}]:[])]}]});
+const guideSchema=(guide,path)=>({'@context':'https://schema.org','@graph':[{'@type':'Article',headline:guide.h1,description:guide.description,mainEntityOfPage:`${domain}${path}`,author,publisher:{'@type':'Organization',name:siteName,url:domain}},{'@type':'BreadcrumbList',itemListElement:[{'@type':'ListItem',position:1,name:siteName,item:`${domain}/`},{'@type':'ListItem',position:2,name:'現場屋向け実務ガイド',item:`${domain}/guide/hp-after-publish/`},...(guide.kind==='full'?[{'@type':'ListItem',position:3,name:'詳細版',item:`${domain}${path}`}]:[])]}]});
 
 function shortGuidePage(guide){
   const path='/guide/hp-after-publish/';
@@ -124,15 +134,15 @@ function articlePage(article,index){
   const next=articles[index-1];
   const related=articles.filter(item=>item.slug!==article.slug&&item.category===article.category).slice(0,2);
   const fallback=articles.filter(item=>item.slug!==article.slug&&!related.includes(item)).slice(0,2-related.length);
-  const navigation=previous||next?`<nav class="post-nav" aria-label="前後の記事">${previous?`<a href="../${previous.slug}/">← 前の記事<br><strong>${escapeHtml(previous.title)}</strong></a>`:'<span></span>'}${next?`<a href="../${next.slug}/">次の記事 →<br><strong>${escapeHtml(next.title)}</strong></a>`:''}</nav>`:'';
+  const navigation=previous||next?`<nav class="post-nav" aria-label="前後の記事">${previous?`<a href="../${previous.slug}/">← 第${escapeHtml(previous.episode)}話<br><strong>${escapeHtml(previous.title)}</strong></a>`:'<span></span>'}${next?`<a href="../${next.slug}/">第${escapeHtml(next.episode)}話 →<br><strong>${escapeHtml(next.title)}</strong></a>`:''}</nav>`:'';
   const relatedItems=[...related,...fallback];
   const relatedSection=relatedItems.length?`<section class="related"><h2>関連記事</h2><div class="related-list">${relatedItems.map(item=>`<a href="../${item.slug}/">${escapeHtml(item.title)}</a>`).join('')}</div></section>`:'';
-  const structuredData={'@context':'https://schema.org','@type':'Article',headline:article.title,description:article.description,datePublished:article.date,mainEntityOfPage:articleUrl(article),publisher:{'@type':'Organization',name:siteName,url:domain}};
-  return `${head({title:`${article.title}｜${siteName}`,description:article.description,path:`/articles/${article.slug}/`,type:'article',assetPrefix:'../../',structuredData})}<body>${header('../../')}<main><header class="article-hero"><div class="wrap"><div class="article-meta"><span class="tag">${escapeHtml(article.category)}</span><time datetime="${article.date}">${formatDate(article.date)}</time></div><h1>${escapeHtml(article.title)}</h1><p>${escapeHtml(article.description)}</p></div></header><div class="wrap article-layout"><article class="article-body">${markdown(article.body)}${navigation}${relatedSection}<a class="back-home" href="../../">トップへ戻る →</a></article><aside class="article-aside"><strong>このブログについて</strong><p>地方の現場職人が、下請けだけに頼らず仕事の入口を作ってきた途中経過を書いています。</p><p>現場仕事を理解したHP制作を、<strong>300,000円（税込）</strong>で行っています。</p><a class="text-link hp-service-link" href="https://construction-web-terra.com/?ref=jiriki-blog#contact">HP制作について詳しく見る →</a></aside></div></main>${footer('../../')}`;
+  const structuredData={'@context':'https://schema.org','@graph':[{'@type':'Article',headline:article.title,description:article.description,datePublished:article.date,dateModified:article.modified||article.date,mainEntityOfPage:articleUrl(article),author,publisher:{'@type':'Organization',name:siteName,url:domain}},{'@type':'BreadcrumbList',itemListElement:[{'@type':'ListItem',position:1,name:siteName,item:`${domain}/`},{'@type':'ListItem',position:2,name:`第${article.episode}話`,item:articleUrl(article)}]}]};
+  return `${head({title:`${article.title}｜${siteName}`,description:article.description,path:`/articles/${article.slug}/`,type:'article',assetPrefix:'../../',structuredData})}<body>${header('../../')}<main><header class="article-hero"><div class="wrap"><div class="article-meta"><span class="tag">第${escapeHtml(article.episode)}話</span><span class="tag">${escapeHtml(article.category)}</span><time datetime="${article.date}">${formatDate(article.date)}</time></div><h1>${escapeHtml(article.title)}</h1><p>${escapeHtml(article.description)}</p></div></header><div class="wrap article-layout"><article class="article-body">${markdown(article.body)}${navigation}${relatedSection}<a class="back-home" href="../../">トップへ戻る →</a></article><aside class="article-aside"><strong>このブログについて</strong><p>愛媛県松山市周辺で外構・エクステリアの現場に携わる職人が、下請け中心から直客の入口を作ってきた途中経過を書いています。</p><p>現場仕事を理解したHP制作を、<strong>300,000円（税込）</strong>で行っています。</p><a class="text-link hp-service-link" href="https://construction-web-terra.com/?ref=jiriki-blog#contact">HP制作について詳しく見る →</a></aside></div></main>${footer('../../')}`;
 }
 
 const legalPages={
-  about:{title:'このブログについて',description:'現場屋の自力経営の運営方針と、記事を書くうえで大切にしていること。',body:`<h2>このブログの目的</h2><p>下請けそのものを否定するのではなく、「下請けしか選べない状態」から少しずつ抜けるために、自分が実際に行ってきたことを記録します。</p><h2>書く内容</h2><p>地方の施工業者として行った集客、価格の失敗、Googleやホームページの活用、まだ結果が出ていない試みも含めて書きます。誰にでも同じ結果が出る成功法則として紹介するものではありません。</p><h2>匿名で運営する理由</h2><p>個人名、屋号、所在地、取引先など、本人や顧客を特定できる情報は掲載しません。実体験の中身を主役にしながら、関係者のプライバシーを守るためです。</p>`},
+  about:{title:'このブログについて',description:'現場屋の自力経営の運営者情報と、記事を書くうえで大切にしていること。',body:`<h2>運営者について</h2><p>愛媛県松山市周辺で、外構・エクステリアの現場に長く携わっている現役の職人です。カーポート施工の経験も多く、今も実際に現場仕事を続けながら、下請け中心だった状態から少しずつ直客の入口を増やしてきました。</p><p>このブログでは、その途中で経験したジモティ、Googleマップ、口コミ、ホームページ、AI検索などの実話を記録しています。</p><h2>このブログの目的</h2><p>下請けそのものを否定するのではなく、「下請けしか選べない状態」から少しずつ抜けるために、自分が実際に行ってきたことを記録します。</p><h2>書く内容</h2><p>地方の施工業者として行った集客、価格の失敗、Googleやホームページの活用、まだ結果が出ていない試みも含めて書きます。誰にでも同じ結果が出る成功法則として紹介するものではありません。</p><h2>匿名で運営する理由</h2><p>個人名、屋号、詳しい所在地、取引先など、本人や顧客を特定できる情報は掲載しません。実体験の中身を主役にしながら、関係者のプライバシーを守るためです。</p>`},
   privacy:{title:'プライバシーポリシー',description:'現場屋の自力経営における個人情報とアクセス情報の取り扱い方針。',body:`<h2>取得する情報</h2><p>お問い合わせ時に提供された内容のほか、アクセス解析を導入した場合は、Cookie等を通じて閲覧ページ、利用環境、流入元などの情報を取得する場合があります。</p><h2>利用目的</h2><p>お問い合わせへの回答、サイトの利用状況の把握、記事や導線の改善、不正利用の防止に利用します。</p><h2>アクセス解析</h2><p>今後Google Analyticsを利用する場合があります。Measurement ID未設定時は解析用スクリプトを読み込まず、外部への計測通信は行いません。Cookieはブラウザ設定で無効にできます。</p><h2>第三者提供</h2><p>法令に基づく場合などを除き、本人の同意なく個人情報を第三者へ提供しません。</p><h2>お問い合わせ</h2><p>連絡先は、お問い合わせページで準備が整い次第案内します。</p>`},
   disclaimer:{title:'免責事項',description:'現場屋の自力経営に掲載する情報の性質と免責事項。',body:`<h2>掲載情報について</h2><p>本サイトは運営者個人の経験と見解を記録するもので、特定の方法による売上、集客、利益その他の成果を保証しません。</p><h2>情報の正確性</h2><p>可能な範囲で正確な情報を掲載しますが、制度、サービス仕様、地域事情などは変わる場合があります。実際の判断は必要に応じて専門家や各サービス提供者へご確認ください。</p><h2>損害等の責任</h2><p>本サイトの情報を利用したことで生じた損害について、運営者は法令上認められる範囲で責任を負いません。</p>`},
   contact:{title:'お問い合わせ',description:'現場屋の自力経営へのお問い合わせについて。',body:`<h2>連絡方法は準備中です</h2><p>現在、お問い合わせ窓口を準備しています。個人名や屋号を公開せず、安全に連絡を受けられる方法が整い次第、このページでご案内します。</p><p>記事に登場する顧客、取引先、地域などを特定するお問い合わせには回答できません。</p>`}
