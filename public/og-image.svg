@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f4f0e5"/>
+  <rect x="72" y="72" width="1056" height="486" rx="24" fill="#fffdf7" stroke="#c8c1ae" stroke-width="2"/>
+  <rect x="120" y="128" width="84" height="84" rx="18" fill="#33483a"/>
+  <text x="162" y="188" text-anchor="middle" font-family="sans-serif" font-size="48" font-weight="700" fill="#fffdf7">自</text>
+  <text x="236" y="185" font-family="sans-serif" font-size="58" font-weight="700" fill="#24342a">現場屋の自力経営</text>
+  <line x1="120" y1="254" x2="1080" y2="254" stroke="#d8d1c1" stroke-width="2"/>
+  <text x="120" y="342" font-family="sans-serif" font-size="34" font-weight="700" fill="#24342a">下請けに頼り切らず、</text>
+  <text x="120" y="400" font-family="sans-serif" font-size="34" font-weight="700" fill="#24342a">自分で仕事を取れる状態を作るまでの実録</text>
+  <text x="120" y="492" font-family="sans-serif" font-size="25" fill="#617064">FIELD NOTES ON INDEPENDENT BUSINESS</text>
+</svg>
