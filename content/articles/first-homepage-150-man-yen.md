@@ -1,8 +1,8 @@
 ---
 title: 初めてのホームページに、約150万円かけた話
 description: ネットが苦手だった外構職人が、弟への約30万円と制作会社への約120万円、合計約150万円をかけて初めてホームページを作り、公開後に分かったこと。
-date: 2026-09-18
-modified: 2026-09-18
+date: 2026-09-22
+modified: 2026-09-22
 category: HP・AI
 episode: 5
 featured: false
